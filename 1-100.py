@@ -683,6 +683,92 @@ def p30():
 
 	return sum(res)
 
+def p31():
+	"""
+	How many different ways can £2 be made using 
+	any number of coins?
+
+	coins:
+	1p, 2p, 5p, 10p, 20p, 50p, £1 (100p), and £2 (200p).
+	"""
+
+	coins = [1, 2, 5, 10, 20, 50, 100, 200]
+
+	res = []
+	def combo(curr, n):
+		if sum(curr) == n:
+			res.append(curr)
+			return 
+		for coin in coins:
+			if coin <= (n-sum(curr)):
+				if (len(curr) == 0) or (coin <= curr[-1]):
+					combo(curr+[coin], n)
+
+	combo([], 200)
+
+	return len(res)
+
+def p32():
+	"""
+	search in 
+	1d * {4d}
+	2d * {3d}
+	"""
+	res = []
+	for d1 in range(1, 10):
+		for d2 in range(1000, 10000):
+			if len(str(d1*d2)+str(d1)+str(d2)) == 9 and \
+				set(str(d1*d2)+str(d1)+str(d2)) == \
+				set(['1', '2', '3', '4', '5', '6', '7', '8', '9']):
+				res.append(d1*d2)
+	for d1 in range(10, 100):
+		for d2 in range(100, 1000):
+			if len(str(d1*d2)+str(d1)+str(d2)) == 9 and \
+				set(str(d1*d2)+str(d1)+str(d2)) == \
+				set(['1', '2', '3', '4', '5', '6', '7', '8', '9']):
+				res.append(d1*d2)
+
+
+	return sum(list(set(res)))
+
+def p33():
+	"""
+	digit cancelling fractions
+	"""
+
+	res = [1, 1]  # num, den
+	for d1 in range(1, 10):
+		for d2 in range(d1+1, 10):
+			for k in range(1, 10):  # non-trivial ending
+				num = [d1*10+k, d1+k*10]
+				den = [d2*10+k, d2+k*10]
+				for n in num:
+					for d in den:
+						if n/d < 1:
+							if n/d == d1/d2:
+								res[0] *= d1
+								res[1] *= d2
+								print(n, d, d1, d2)
+
+	print(res)
+	lowest_common_terms = Cores().fractionToMinimumFraction(0, res[0], res[1])  # debug
+
+	return lowest_common_terms[1]
+
+def p34():
+	"""
+	Find the sum of all numbers which are equal
+	 to the sum of the factorial of their digits.
+	"""
+
+	# brute-force 7 digits
+
+	res = []
+	for n in range(3, 10**7):
+		if sum([math.factorial(int(i)) for i in str(n)]) == n:
+			res.append(n)
+
+	return sum(res)
 
 def p35():
 	"""
@@ -716,6 +802,32 @@ def p35():
 	print("cnt", cnt)
 
 	return 
+
+def p36():
+	"""
+	Find the sum of all numbers, 
+	less than one million, which are palindromic in base 10 and base 2.
+	"""
+	def base_2(n):
+		"""
+		change a n to base 2
+		"""
+
+		res = []
+		while n > 0:
+			res.append(n%2)
+			n >>= 1
+
+		return res
+
+	res = []
+	for n in range(1, 10**6+1):
+		if str(n) == str(n)[::-1]:
+			b_2 = base_2(n)
+			if b_2 == b_2[::-1]:
+				res.append(n)
+
+	return sum(res)
 
 def p37():
 	"""
@@ -814,6 +926,78 @@ def p37():
 	# print(select_next_digit(73373))
 	return 
 
+def p38():
+	"""
+	What is the largest 1 to 9 pandigital 9-digit number 
+	that can be formed as the concatenated product of an 
+	integer with (1,2, ... , n) where n > 1?
+
+	e.g. 192|384|576 -> 192, (1, 2, 3)
+
+	(?)
+	"""
+	res = []
+	for n in range(1, 10**4):  # check under 4-digits
+		tmp = []
+		for i in range(1, 10):
+			tmp.extend([int(j) for j in str(n*i)])
+			if len(tmp) >= 9:
+				break
+		if len(tmp) == 9:
+			if set(tmp) == set([1, 2, 3, 4, 5, 6, 7, 8, 9]):
+				res.append(int(''.join([str(k) for k in tmp])))
+
+	return max(res)
+
+def p39():
+	"""
+	For which value of p ≤ 1000 as the perimeter, 
+	is the number of int solutions (right angle triangle) maximised?
+	"""
+
+	max_sol_n = -1
+	max_sol_n_p = -1
+	for p in range(12, 1001):
+		sol_n = 0
+		# a < b
+		for a in range(1, p//3):
+			for b in range(a+1, (p-a)//2):
+				if a**2 + b**2 == (p-a-b)**2:
+					sol_n += 1
+
+		if sol_n > max_sol_n:
+			max_sol_n = sol_n
+			max_sol_n_p = p
+
+	return max_sol_n_p
+
+def p40():
+	"""
+	An irrational decimal fraction is created by concatenating the positive integers:
+
+	0.123456789|10|11|12|13|14|15|16|17|18|19|20|21...
+
+	It can be seen that the 12th digit of the fractional part is 1.
+
+	If d_n represents the nth digit of the fractional part, find the value of the following expression.
+
+	d_1 × d_10 × d_100 × d_1000 × d_10000 × d_100000 × d_1000000
+	"""
+
+	found = []
+	search = [1, 10, 100, 1000, 10000, 100000, 1000000]
+
+	total_digits = 1
+	current_int_part = 1
+	while len(found) < 7:
+		if search[0]<=total_digits:
+			found.append(int(str(current_int_part)[-(total_digits-search[0])-1]))
+			search.pop(0)
+		current_int_part += 1
+		total_digits += len(str(current_int_part))
+
+	return reduce(lambda x, y: x*y, found)
+
 def p41():
 	"""
 	Largest n-digit pan-digital (\pi(1, 2, 3, ..., n)) prime that exists
@@ -861,6 +1045,154 @@ def p41():
 	prime_candidates = set(Cores().primesBelowN(7654321))
 	print(max(generate_pandigital(0, prime_candidates)))
 
+def p42():
+	"""
+	how many are triangle words?
+	"""
+
+	s = ''''''
+	res = 0
+	for w in s.split(','):
+		t = sum([ord(c)-64 for c in w.strip('"')])
+		est_n = math.floor(math.sqrt(2*t))
+		if est_n * (est_n+1) == 2*t:
+			res += 1
+
+	return res
+
+def p43():
+	"""
+	Find the sum of all 0 to 9 pandigital numbers with this property.
+	"""
+	primes = [2, 3, 5, 7, 11, 13, 17]
+	num = [0]
+
+	def __permute_check(candidates, curr=[], res=[], N=-1, cnt=0):
+		"""
+		add in the checking for p43
+		"""
+		if len(curr) > 3:
+			if int(''.join([str(p) for p in curr[-3:]])) % primes[len(curr)-2-1-1] != 0:
+				return # terminate early
+
+		if (len(candidates) == 0) | (cnt >= N):  # candidates exhausted, or max depth reached
+			# res.append(curr)
+			print(curr, flush=1)
+			num[0] += int(''.join([str(p) for p in curr]))
+			return # return from leaves / internal roots
+
+		for c in candidates:
+			if cnt == 0 and c == 0:
+				continue
+			candidates_copy = [i for i in candidates]
+			candidates_copy.pop(candidates.index(c))  
+			__permute_check(candidates_copy, curr=curr+[c], res=res, N=N, cnt=cnt+1)
+
+		return # from root
+
+	__permute_check([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], N=100)
+
+	return num[0]
+
+def p44():
+	"""
+	Pentagon number pairs
+
+	iterate the pairs as (1, 2), | (2, 3), (1, 3),| (3, 4), (2, 4), (1, 4), | ...
+	"""
+
+	MAX = 10000
+	pentagons = [n*(3*n-1)/2 for n in range(1, MAX)]
+	def is_pentagon(m):
+		if (math.sqrt(12*2*m+1)+1) % 6 == 0:
+			return 1
+		else:
+			return 0 
+	print(is_pentagon(1), is_pentagon(5), is_pentagon(12))
+	col = 2
+	found = 0
+	while not found:
+		for row in range(col-1, 0, -1):
+			if is_pentagon(pentagons[col-1] - pentagons[row-1]) & \
+				is_pentagon(pentagons[col-1] + pentagons[row-1]):
+				found = 1
+				break
+		col += 1
+	return abs(pentagons[col-2] - pentagons[row-1])
+
+def p45():
+	"""
+	Find the next triangle number that is also pentagonal and hexagonal.
+	"""
+
+	# start from t285, p165, h143, h(n) increases most rapidly
+
+	t_n = 285
+	p_n = 165
+	h_n = 143
+
+	def t(n):
+		return n*(n+1)/2
+	def p(n):
+		return n*(3*n-1)/2
+	def h(n):
+		return n*(2*n-1)
+
+	# init
+	found = 0
+	h_n +=1 
+	curr = h(h_n) # to catch up on
+	anchor = 2
+
+	while not found:
+		catching_ups = [0, 1, 2]
+		catching_ups.pop(anchor)
+		anchor_update = 0
+		for catching_up in catching_ups:
+			if catching_up == 0:
+				t_catch_up = 0
+				while not t_catch_up:
+					if t(t_n) < curr:
+						t_n += 1
+					elif t(t_n) == curr:
+						t_catch_up = 1
+					else:
+						curr =t(t_n)
+						anchor = 0
+						anchor_update = 1
+				if anchor_update == 1:
+					break # use the new anchor; reinitiate the catching up state
+			elif catching_up == 1:
+				p_catch_up = 0
+				while not p_catch_up:
+					if p(p_n) < curr:
+						p_n += 1
+					elif p(p_n) == curr:
+						p_catch_up = 1
+					else:
+						curr =p(p_n)
+						anchor = 1
+						anchor_update = 1
+				if anchor_update == 1:
+					break
+			else:
+				h_catch_up = 0
+				while not h_catch_up:
+					if h(h_n) < curr:
+						h_n += 1
+					elif h(h_n) == curr:
+						h_catch_up = 1
+					else:
+						curr =h(h_n)
+						anchor = 2
+						anchor_update = 1
+				if anchor_update == 1:
+					break
+		if anchor_update == 0:
+				found = 1
+
+	return curr
+
 def p47():
 	"""
 	Find the first four consecutive integers to have four distinct prime factors each
@@ -897,6 +1229,24 @@ def p47():
 		print(res)
 
 	return res
+
+def p48():
+	"""
+	Find the last ten digits of the series, 1^1 + 2^2 + 3^3 + ... + 1000^1000.
+	"""
+
+	# only keep the last 10 digits for the current result (* / +)
+
+	curr_sum = 0
+	for i in range(1, 1001):
+		curr_power = 1
+		for j in range(1, i+1):
+			curr_power *= i
+			curr_power = int(str(curr_power)[-10:])
+		curr_sum += curr_power
+		curr_sum = int(str(curr_sum)[-10:])
+
+	return curr_sum 
 
 def p49():
 	"""
@@ -1273,6 +1623,35 @@ def p66():
 
 	return max_x_D, max_x
 
+def p67():
+	"""
+	larger scale version of p18
+	"""
+	triangle = \
+	[[int(n) for n in l.split(' ')] for l in """""".split('\n')]
+	
+	# i-th at n-th row, could only move to i and i+1 at n+1-th row
+	# use DP; table
+
+	maximal_L_path = [[0 for i in l] for l in triangle]
+	for row_n in range(len(triangle)):
+		if row_n == 0:
+			maximal_L_path[row_n][0] = triangle[row_n][0]
+		else:
+			for pos_i in range(len(triangle[row_n])):
+				if 0 < pos_i < row_n:
+					maximal_L_path[row_n][pos_i] = triangle[row_n][pos_i] + \
+							max(maximal_L_path[row_n-1][pos_i],
+								maximal_L_path[row_n-1][pos_i-1])
+				elif pos_i == row_n:
+					maximal_L_path[row_n][pos_i] = triangle[row_n][pos_i] + \
+							maximal_L_path[row_n-1][pos_i-1]
+				elif pos_i == 0:
+					maximal_L_path[row_n][pos_i] = triangle[row_n][pos_i] + \
+							maximal_L_path[row_n-1][pos_i]
+
+	return max(maximal_L_path[-1])
+
 def p77():
 	"""
 	(divide & conquer)
@@ -1331,6 +1710,105 @@ def p77():
 		if no_sum_ways >= 5000:
 			print(n)
 			return 	
+
+def p78():
+	"""
+	# Method 1
+	# a DP problem
+	Find the least value of n for which p(n) is divisible by one million.
+	# A integer partitioning problem https://en.wikipedia.org/wiki/Partition_(number_theory)
+	# The according sequence https://oeis.org/A000041
+	# the starting part of the sequence:
+	# (1, 1,) 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77, 101, 135, 176, 231, 297, 385, 490, 627, 792, 1002, 1255, 1575, 1958, 2436, 3010, 3718, 4565, 5604, 6842, 8349, 10143, 12310, 14883, 17977, 21637, 26015, 31185, 37338, 44583, 53174, 63261, 75175, 89134, 105558, 124754, 147273, 173525
+	
+	"""
+	# The recurrence
+	# P(N, d) the subproblem is to separate M coins using piles with size #>d only 
+	# P(N, d) = \sum_{m=0}^{floor(N/d)-1} P(N-m*d, d+1)
+	# init: P(N, N)=1, P(N, 1)=1
+	# The solution is n = argmin_N 10^6|P(N, 1)
+	#           N  
+	#     1 2 3 4
+	# k  -----------------------
+	# 1 | 1 * * * ...
+	# 2 |   1 * *
+	# 3 |     1 *
+	# 4 |       1
+	#   |        ...
+
+	'''
+	# only store up the values for computation, or store them all in the dictionary (key-value pairs)
+	P_table = dict()
+	gt = [1, 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77, 101, 135, 176, 231, 297, 385, 490, 627, 792, 1002, 1255, 1575, 1958, 2436, 3010, 3718, 4565, 5604, 6842, 8349, 10143, 12310, 14883, 17977, 21637, 26015, 31185, 37338, 44583, 53174, 63261, 75175, 89134, 105558, 124754, 147273, 173525]
+	# uptill N = len(gt)
+	# no error, but runs really slow....
+
+	N = 1
+	P_table[(1, 1)]=1 # N, k
+	# debug
+	# while N < len(gt):
+	# 	# print("N:", N)
+	# 	# print(P_table)
+	
+	t = time.time()
+	while P_table[(N, 1)] % (10**6) != 0:
+		# fill up P(N+1, 1)
+		N += 1
+		P_table[(N, N)]=1
+		for k in range(N-1, 0, -1):  # N-1, ..., 1
+			P_table[(N, k)] = 0
+			# print("\nP(%s, %s)=" % (N, k), end='')
+			for m in range(0, math.floor(N/k)): # 1, ..., floor(N/k)-1 
+				if (N-m*k) >= (k+1):
+					P_table[(N, k)] += P_table[(N-m*k, k+1)]
+				else:
+					P_table[(N, k)] += 1 # margin
+		# if P_table[(N, 1)] != gt[N-1]:
+			# print("error at N=", N)
+
+	# dt = np.zeros((N, N))
+	# for k, v in P_table.items():
+	# 	dt[k[1]-1][k[0]-1] = v
+	# print(dt)
+
+	print("Found N in", (time.time()-t) / 60, " secs")
+	return N
+	'''
+
+	# method 2, use the generating function 
+	# [x^n] = \pi_i 1/(1-x^i) = \sum_i p(i)x^i
+	# the multiplicative inverse is the Euler function: 
+	# \pi_i(1-x^i) = 1 + \sum_{k=1}^{inf} (-1)^k [x^{k(3k-1)/2} + x^{k(3k+1)/2}]
+	#              = 1-x-x^2+x^5+x^7 ...
+	# therefore from (1-x-x^2+x^5+x^7)[x^n] = 1
+	# we have to set all C(n)x^n=0 so that
+	#  p(n)x^n  + [ - x^1          - x^2          + x^5          ...] = 0
+	#               p(n-1)x^{n-1}  p(n-2)x^{n-2}  p(n-5)x^{n-5} 
+	# therefore we have
+	#  p(n) = p(n-1)+p(n-2)-p(n-5)-p(n-7) ...
+
+	MAX = 100000
+	P = [1, 1, 2]
+	for n in range(3, MAX):
+		P.append(0)
+		for k in range(1, n): # math.floor((-1+math.sqrt(1+24*n))/6)):
+			if k % 2 == 0:
+				m = -1
+			else:
+				m = 1
+			i = int(k*(3*k-1)/2)
+			if n-i < 0:
+				break
+			# print("p(", n, ")+=", m, "p(", n-i, ")")
+			P[n] += m * P[n-i]
+			i = int(k*(3*k+1)/2)
+			if n-i < 0:
+				break
+			# print("p(", n, ")+=", m, "p(", n-i, ")")
+			P[n] += m * P[n-i]
+		# print("n=", n, "p(n)=", P[n])  # debug
+		if P[n] % (10**6) == 0:
+			return n
 
 def p87():
 	"""

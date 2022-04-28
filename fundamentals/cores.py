@@ -560,6 +560,7 @@ class GraphTheory:
 	def __init__(self):
 		pass
 
+	## data structure ##############################
 	def get_adjacency_list(self, N:list, E:list, directed:int=1):
 		"""
 		list of sets (in Adjacency list, the order of nbrs do not matter)
@@ -572,6 +573,7 @@ class GraphTheory:
 				A[A_ind[e[1]]].add(A_ind[e[0]])
 		return A, A_ind
 		
+	## traversing ##############################
 	def BFS(self, A:list, src:int):
 		"""
 		# A: adjacency list
@@ -626,6 +628,70 @@ class GraphTheory:
 
 		return N_pre_post
 
+	## MST ##############################
+	def Prim(self, nodes, weighted_edges):
+		"""
+		expand the current tree by adding in the least weighted edges connecting to the nodes outside
+		"""
+		# create a adj list based on weighted_edges
+		Adj = dict([(n, []) for n in nodes])
+		for u,v,w in weighted_edges: # undirected
+			Adj[u].append(v)
+			Adj[v].append(u)
+		weighted_edges = dict([((u, v), w) for u, v, w in weighted_edges] + 
+								[((v, u), w) for u, v, w in weighted_edges])
+
+
+		current_tree_nodes = {nodes[0]}
+		MST_edges = [] 
+		# outside_nodes = set(nodes[1:])
+
+		while len(current_tree_nodes) < len(nodes):
+			min_edge = -1
+			min_weight = math.inf
+			for n in current_tree_nodes:
+				for m in Adj[n]:
+					if m not in current_tree_nodes:
+						if weighted_edges[(n, m)] < min_weight:
+							min_edge = (n, m, weighted_edges[(n, m)])
+							min_weight = weighted_edges[(n, m)]
+			MST_edges.append(min_edge)
+			current_tree_nodes.add(min_edge[1])
+
+		return MST_edges
+
+	def Kruskal(self, nodes, weighted_edges):
+		"""
+		merging subtrees by adding edges in the order of ascending weight and avoid loop
+		:param weighted_edges, [(u, v, w), ...]
+		:param nodes, [u1, u2, u3, ...]
+		"""
+		weighted_edges = sorted(weighted_edges, key = lambda t:t[-1])
+		current_subtrees = [{n} for n in nodes]
+		MST_edges = []
+
+		while len(current_subtrees) > 1:
+			for u, v, w in weighted_edges:
+				sub_tree_1 = -1
+				for i, sub_tree in enumerate(current_subtrees):
+					if u in sub_tree:
+						sub_tree_1 = i
+						break
+				sub_tree_2 = -1
+				for i, sub_tree in enumerate(current_subtrees):
+					if v in sub_tree:
+						sub_tree_2 = i
+						break
+
+				if sub_tree_1 != sub_tree_2:
+					current_subtrees[sub_tree_1] = current_subtrees[sub_tree_1].union(current_subtrees[sub_tree_2])
+					current_subtrees.pop(sub_tree_2)
+					MST_edges.append((u, v, w))
+
+		return MST_edges
+
+
+	## SCC ##############################
 	def undirected_get_components(self, A:list):
 		"""
 		For undirected, get connected components
@@ -673,8 +739,10 @@ class GraphTheory:
 
 if __name__ == "__main__":
 	# the main function here is for unit test
-	dic = {1:[2, 3], 3:[4, 5]}
-	print(Dic().dic_reverse(dic))
+	nodes = [0, 1, 2, 3, 4]
+	weighted_edges = [(0, 1, 1), (1, 2, 1), (2, 3, 1), (3, 4, 1),
+						(2, 4, 2), (1, 4, 3)]
+	print(GraphTheory().Kruskal(nodes, weighted_edges))
 
 
 
