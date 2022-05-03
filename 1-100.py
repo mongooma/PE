@@ -1362,6 +1362,47 @@ def p51():
 
 	return -1 
 
+def p52():
+	"""
+	brute-force
+
+	Find the smallest positive integer, x, 
+	such that 2x, 3x, 4x, 5x, and 6x, contain the same digits.
+	"""
+
+	MAX = 1000000
+
+	for n in range(1, MAX):
+		if (set(str(2*n)) == set(str(3*n)) == set(str(4*n)) == set(str(5*n)) == set(str(6*n))) and \
+			(len(str(2*n)) == len(str(3*n)) == len(str(4*n)) == len(str(5*n)) == len(str(6*n))):
+			return n
+
+def p53():
+	"""
+	how many comb(n, r), 1<=n<=100, not necessarily distinct values are greater than 10^6?
+	"""
+
+	sol = 0
+	for n in range(1, 101):
+		for r in range(0, n):
+			if comb(n, r) > 10**6:
+				sol += 1
+
+	return sol
+
+def p56():
+	"""
+	Considering natural numbers of the form, a^b, where a, b < 100, what is the maximum digital sum?
+	"""
+
+	sol = -1
+	for a in range(1, 101):
+		for b in range(1, 101):
+			sum_curr = sum([int(s) for s in str(a**b)])
+			if  sum_curr > sol:
+				sol = sum_curr
+	return sol
+
 def p58():
 	"""
 	(note: ppl think this one is easy, but it seems bulky to me...)
@@ -1410,6 +1451,59 @@ def p58():
 
 	# print(res)
 	return L
+
+def p59():
+	"""
+	XOR 
+	
+	Your task has been made easy, 
+	as the encryption key consists of three lower case characters. 
+	Using p059_cipher.txt, 
+	a file containing the encrypted ASCII codes, 
+	and the knowledge that the plain text must contain common English words, 
+	decrypt the message and find the sum of the ASCII values in the original text.
+	"""
+
+	encoding = ''''''
+	chars = [chr(n) for n in range(97, 97+26)]
+
+	key_candids = Structures().permutations(chars, 3)  # e.g. 'abc'
+
+	def decrypt(code, key):
+		"""XOR cyclic decryption"""
+		# extend the key cylically till the length of the code
+
+		key_ext = ''.join([key for i in range(len(code)//len(key))]) + key[:(len(code)%len(key))]
+		key_ext = [ord(k) for k in key_ext]
+		
+		ori = ''.join([chr(k ^ int(c)) for (k, c) in zip(key_ext, code)])
+		return ori
+
+	# validity check
+	# 1. if the returned ori contains:
+	# "are", "is", "he", "she", "it", "and"
+
+	sols = []
+	checks = ['are', 'is', 'and']
+	code = encoding.split(',')
+	for key in key_candids:
+		ori = decrypt(code, ''.join(key))
+		valid = 1
+		for c in checks:
+			if c not in ori:
+				valid=0
+				break
+		if valid:
+			sols.append(ori)
+
+	print(len(sols))  # 5
+	final_sol = ''
+	for sol in sols:
+		if sol.startswith('An extract taken'):
+			final_sol = sol
+			break
+
+	return sum([ord(i) for i in sol]) 
 
 def p60():
 	"""
@@ -1534,6 +1628,32 @@ def p61():
 
 	return 
 
+def p63():
+	"""
+	How many n-digit positive integers exist which are also an nth power?
+
+	10^(n-1) < a^n < 10^n-1
+
+	n-1 < nlog_10(a) < n
+
+	1-1/n < log_10(a) < 1
+
+	math.sqrt(10) < a < 10
+
+	a in {4, 5, 6, 7, 8, 9}
+
+	a = 4, 1-1/n < 0.6 < n, n < 2.5, n={2}
+	...
+	"""
+
+	nums = set()
+	for a in [4, 5, 6, 7, 8, 9]:
+		for n in range(2, math.ceil(1/(1-math.log(a)/math.log(10)))):
+			print('a=', a, ', n=', n, ', a^n=', a**n)
+			nums.add(a**n)
+
+	return len(nums)+9 # 1 ... 9, ^1
+
 def p64():
 	"""
 	How many continued fractions for N<10000 have an odd period?
@@ -1651,6 +1771,91 @@ def p67():
 							maximal_L_path[row_n-1][pos_i]
 
 	return max(maximal_L_path[-1])
+
+def p68():
+	"""
+	Magic 5-gon ring
+	(brute-force)
+
+	arm :
+		      b_prev
+		     /
+		    a_prev
+	       /
+	a_ - a - b	
+	"""
+	# recursive for 5 layers
+	all_no = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+	# all_no = [1, 2, 3, 4, 5]
+	sols = []
+	def next_arm(remained_no=[], prev_arm=(), current_sol=[], level=-1):
+		b_prev, a_prev, a = prev_arm
+		if level == 4: # debug
+		# if level == 2:
+			assert(len(remained_no)==1)
+			a_0 = current_sol[0][1]
+			if (remained_no[0] + a_0) == (b_prev + a_prev):
+				sols.append(current_sol+[[remained_no[0], a, a_0]])
+			return 
+		
+		# choose b freely
+		for b in remained_no:
+			remained_no_copy = copy.copy(remained_no)
+			remained_no_copy.pop(remained_no_copy.index(b))
+			for a_ in remained_no_copy:
+				if (b + a_) == (b_prev + a_prev):
+					# choose this a
+					remained_no_copy.pop(remained_no_copy.index(a_))
+					next_arm(remained_no_copy, prev_arm=(b, a, a_), 
+						     current_sol=current_sol+[[b, a, a_]], level=level+1)
+				# no solution, do nothing
+		return 
+
+	# fix the initial arm with 10 as the external number
+	for a_prev in all_no:
+		all_no_copy = copy.copy(all_no)
+		all_no_copy.pop(all_no_copy.index(a_prev))
+		for a in all_no_copy:
+			all_no_copy_copy = copy.copy(all_no_copy)
+			all_no_copy_copy.pop(all_no_copy_copy.index(a))
+			next_arm(remained_no=all_no_copy_copy, prev_arm=(10, a_prev, a), 
+												current_sol=[[10, a_prev, a]], level=1)
+			# next_arm(remained_no=all_no_copy_copy, prev_arm=(6, a_prev, a), 
+												# current_sol=[[6, a_prev, a]], level=1)
+		
+	print(sols)
+	candids = []
+	for sol in sols:
+		start_arm_ind = sol.index(min(sol, key=lambda t:t[0]))
+		sol_resort = sol[start_arm_ind:] + sol[:start_arm_ind]
+		candids.append(int(''.join([''.join([str(a) for a in arm]) for arm in sol_resort])))
+
+	return max(candids)
+
+def p76():
+	"""Integer partition (ref p78)"""
+
+	MAX = 100000
+	P = [1, 1, 2]
+	for n in range(3, 101):
+		P.append(0)
+		for k in range(1, n): # math.floor((-1+math.sqrt(1+24*n))/6)):
+			if k % 2 == 0:
+				m = -1
+			else:
+				m = 1
+			i = int(k*(3*k-1)/2)
+			if n-i < 0:
+				break
+			# print("p(", n, ")+=", m, "p(", n-i, ")")
+			P[n] += m * P[n-i]
+			i = int(k*(3*k+1)/2)
+			if n-i < 0:
+				break
+			# print("p(", n, ")+=", m, "p(", n-i, ")")
+			P[n] += m * P[n-i]
+
+	return P[100]
 
 def p77():
 	"""
@@ -1810,6 +2015,154 @@ def p78():
 		if P[n] % (10**6) == 0:
 			return n
 
+def p79():
+	"""
+	(compute by hand)
+
+	dag - topo-sort
+
+	use a stack to record the nodes with no unvisited nbrs,
+	the pop up seq is the topo-sort
+	"""
+
+	pass
+
+def p81():
+	"""
+	DP problem
+	The minimum length path only moving right and down
+	"""
+
+	mat = ''''''
+	
+	m = np.array([[int(n) for n in l.split(',')] for l in mat.split('\n')])
+
+	D = np.zeros(m.shape)
+	for row in range(m.shape[0]):
+		D[row][0] = sum(m[:row+1, 0])
+	for col in range(m.shape[1]):
+		D[0][col] = sum(m[0, :col+1])
+	for row in range(1, D.shape[0]):
+		for col in range(1, D.shape[1]):
+			D[row][col] = min(D[row][col-1], D[row-1][col]) + m[row][col]
+
+	return D[-1][-1]
+
+def p82():
+	"""
+	Shortest path problem
+	"""
+	mat = ''''''
+	W = np.array([[int(n) for n in l.split(',')] for l in mat.split('\n')])
+	edges = [] # (u, v, w) weighted
+	vertices = [(u, v) for u in range(W.shape[0]) for v in range(W.shape[1])] # (row, col)
+
+	# -> edges
+	for row in range(W.shape[0]):
+		for col in range(1, W.shape[1]):
+			edges.append(((row, col-1), (row, col), W[row][col]))
+	# down edges
+	for row in range(1, W.shape[0]):
+		for col in range(0, W.shape[1]):
+			edges.append(((row-1, col), (row, col), W[row][col]))
+	# up edges
+	for row in range(1, W.shape[0]):
+		for col in range(0, W.shape[1]):
+			edges.append(((row, col), (row-1, col), W[row-1][col]))
+
+	def BellmanFord(vertices, edges, src):
+		# Step 1: initialize graph
+		distance = dict([(v, np.inf) for v in vertices])
+		predecessor = dict([(v, -1) for v in vertices])
+		
+		distance[src] = W[src[0]][src[1]]  # The distance from the source to itself is, of course, zero
+
+		# Step 2: relax edges repeatedly
+		for i in range(len(vertices)-1): # the longest path possible
+			change = 0
+			for (u, v, w) in edges:
+				if distance[u] + w < distance[v]:
+					change += 1
+					distance[v] = distance[u] + w
+					predecessor[v] = u
+			if change == 0:
+				break # early stop
+
+		# Step 3: check for negative-weight cycles
+		for (u, v, w) in edges:
+			if distance[u] + w < distance[v]:
+				print("Graph contains a negative-weight cycle")
+
+		return distance, predecessor
+	
+	min_all = np.inf
+	for i in range(W.shape[0]):
+		print(i)
+		src = (i, 0) 
+		distance, _ = BellmanFord(vertices, edges, src)
+		min_curr = min([distance[u] for u in [(i, 79) for i in range(W.shape[0])]]) 
+		if min_curr < min_all:
+			min_all = min_curr
+
+	return min_all
+
+def p83():
+	"""
+	Shortest path problem
+	"""
+	mat = ''''''
+	W = np.array([[int(n) for n in l.split(',')] for l in mat.split('\n')])
+	edges = [] # (u, v, w) weighted
+	vertices = [(u, v) for u in range(W.shape[0]) for v in range(W.shape[1])] # (row, col)
+
+	# -> edges
+	for row in range(W.shape[0]):
+		for col in range(1, W.shape[1]):
+			edges.append(((row, col-1), (row, col), W[row][col]))
+	# <- edges
+	for row in range(W.shape[0]):
+		for col in range(1, W.shape[1]):
+			edges.append(((row, col), (row, col-1), W[row][col-1]))
+
+	# down edges
+	for row in range(1, W.shape[0]):
+		for col in range(0, W.shape[1]):
+			edges.append(((row-1, col), (row, col), W[row][col]))
+	# up edges
+	for row in range(1, W.shape[0]):
+		for col in range(0, W.shape[1]):
+			edges.append(((row, col), (row-1, col), W[row-1][col]))
+
+	def BellmanFord(vertices, edges, src):
+		# Step 1: initialize graph
+		distance = dict([(v, np.inf) for v in vertices])
+		predecessor = dict([(v, -1) for v in vertices])
+		
+		distance[src] = W[src[0]][src[1]]  # The distance from the source to itself is, of course, zero
+
+		# Step 2: relax edges repeatedly
+		for i in range(len(vertices)-1): # the longest path possible
+			change = 0
+			for (u, v, w) in edges:
+				if distance[u] + w < distance[v]:
+					change += 1
+					distance[v] = distance[u] + w
+					predecessor[v] = u
+			if change == 0:
+				break # early stop
+
+		# Step 3: check for negative-weight cycles
+		for (u, v, w) in edges:
+			if distance[u] + w < distance[v]:
+				print("Graph contains a negative-weight cycle")
+
+		return distance, predecessor
+
+	src = (0, 0) 
+	distance, _ = BellmanFord(vertices, edges, src)
+
+	return distance[(79, 79)]
+
 def p87():
 	"""
 	("complexity control")
@@ -1844,6 +2197,50 @@ def p87():
 	print(len(res))
 	return 
 
+def p90():
+	"""
+	brute-force is trivial and not costly
+
+	(bipartite & greedy does not work; better design needed)
+	"""
+	all_nodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+	S1_candids = Structures().combinations(all_nodes, 6)
+	S2_candids = Structures().combinations(all_nodes, 6)
+	sols = []
+
+	def check_all(S1, S2):
+		edges = [tuple(sorted([s1, s2])) for s1 in S1 for s2 in S2]
+
+		for comb in [(0, 1), (0, 4), (2, 5), 
+						(1, 8)]:
+			if comb not in edges:
+				return 0
+		for comb in [(3, 6), (0, 9), (1, 6), (4, 9), (4, 6)]:
+			if comb not in edges:
+				if comb[-1] == 6:
+					if (comb[0], 9) not in edges:
+						return 0
+				else:
+					if (comb[0], 6) not in edges:
+						return 0
+		return 1 
+
+	for S1 in S1_candids:
+		for S2 in S2_candids:
+			if check_all(S1, S2):
+				sols.append(tuple(sorted([tuple(sorted(S1)), tuple(sorted(S2))])))
+
+	sols_mirror = 0
+
+	for s in set(sols):
+		if s[0] == s[1]:
+			sols_mirror += 1
+		else:
+			sols_mirror += 2
+	# return sols_mirror
+
+	return len(set(sols))
+
 def p97():
 	"""Find the last 10 digits of 28433*2^7830457+1, the non-Mersenne prime"""
 	# only calculate * 2 on the last 10 digits of the returned result from the previous calculation
@@ -1855,9 +2252,30 @@ def p97():
 
 	return n+1
 
+def p99():
+	"""
+	"""
+
+	base_exp = ''''''
+
+	sol = []
+	max_curr = -1
+	max_l_curr = ''
+
+	for i, l in enumerate(base_exp.split('\n')):
+		# a ^ b
+
+		a = int(l.split(',')[0])
+		b = int(l.split(',')[1])
+
+		if math.log(b) + math.log(math.log(a)) > max_curr:
+			max_curr = math.log(b) + math.log(math.log(a))
+			max_lno_curr = i+1
+
+	return max_lno_curr
 
 if __name__ == "__main__":
-	print(p13())
+	print(p82())
 			 
 
 

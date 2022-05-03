@@ -540,7 +540,9 @@ class Structures:
 		return __permute(candidates, N=N)
 
 	def combinations(self, candidates, N=-1):
-
+		"""
+		choose N from candidates
+		"""
 		def __combine(candidates, N=-1, ind=0, curr=[], res=[], cnt=0):
 			if (ind>len(candidates)-1) | (cnt >= N):  # candidates exhausted, or max depth reached
 				if cnt == N:
@@ -739,10 +741,8 @@ class GraphTheory:
 
 if __name__ == "__main__":
 	# the main function here is for unit test
-	nodes = [0, 1, 2, 3, 4]
-	weighted_edges = [(0, 1, 1), (1, 2, 1), (2, 3, 1), (3, 4, 1),
-						(2, 4, 2), (1, 4, 3)]
-	print(GraphTheory().Kruskal(nodes, weighted_edges))
+	candidates = [1, 2, 3, 4]
+	print(Structures().combinations(candidates, 2))
 
 
 
