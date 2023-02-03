@@ -2163,6 +2163,23 @@ def p83():
 
 	return distance[(79, 79)]
 
+def p85():
+	"""
+	Count the number of rectangles in grids n*m
+
+	Although there exists no rectangular grid that contains exactly 
+	two million rectangles, find the area of the grid with the nearest 
+	solution.
+	"""
+	MAX = 2000
+	sols = [] # area, # of squares
+	for x in range(1, MAX):
+		for y in range(1, MAX):
+			sols.append((x*y, x*y*(1+x)*(1+y)/4))
+
+	ind = np.argmin([abs(sol[1] - 2*(10**6)) for sol in sols])
+	return sols[ind][0]
+
 def p87():
 	"""
 	("complexity control")
