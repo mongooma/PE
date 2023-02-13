@@ -7,11 +7,6 @@ from itertools import cycle
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
-Recovery Key:1902064-ktknPUtbHXOC3Oz1g5c8AbRYt0TMIV9XhkJWL1Hi
-Direct Link:https://projecteuler.net/recovery=1902064-ktknPUtbHXOC3Oz1g5c8AbRYt0TMIV9XhkJWL1Hi
-Generated:Wed, 2 Feb 2022, 06:48.01"""
-
 class Array:
 	def __init__(self):
 		pass
