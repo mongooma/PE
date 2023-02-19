@@ -2,5 +2,5 @@ temp.py
 current.py
 key
 200todos.py
-./PE.egg-info
-./*/pending*
+PE.egg-info/*
+**/pending*
