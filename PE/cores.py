@@ -184,7 +184,7 @@ class Cores:
 		Get all the primes below N, return a list
 		# use space to save time
 
-		Similar to the "sieve's algorithm" but more efficient
+		Similar to the "sieve's algorithm"
 
 		"""
 

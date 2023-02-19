@@ -1,4 +1,5 @@
-from fundamentals.cores import Cores, Structures, GraphTheory, Array
+from PE import cores
+from cores import Cores, Structures, GraphTheory, Array
 import time
 import sys
 import math
@@ -1193,6 +1194,39 @@ def p45():
 
 	return curr
 
+def p46():
+	"""
+	the smallest odd composite that cannot be written as the sum of a prime and twice a square
+
+	m = p + 2 * k^2
+
+	use the inbuilt sqrt for efficiently getting the square root
+	"""
+
+	MAX = 100000 # top MAX odd composite
+	primes = Cores().primesBelowN(MAX)
+	primes_s = set(primes)
+	# print(primes)
+
+
+	for n in range(7, MAX):
+		if (n % 2 == 1) and (n not in primes_s):
+			found = 0
+			for p in primes:
+				if p < n:
+					m = n
+					m -= p
+					if m % 2 == 0:
+						m = m // 2
+						if ceil(sqrt(m)) ** 2 == m:
+							found = 1
+							# debug
+							# print("n, prime, square:", n, p, m)
+			
+			if not found:
+				return n
+
+
 def p47():
 	"""
 	Find the first four consecutive integers to have four distinct prime factors each
@@ -1389,6 +1423,33 @@ def p53():
 				sol += 1
 
 	return sol
+
+def p55():
+	"""
+	How many Lychrel numbers are there below ten-thousand?
+
+	1. If not turn palindrome in 50 iters then announce it to be Lychrel
+	2. Some palindrome itself is also Lychrel)
+	"""
+
+	sol = 0
+	for n in range(1, 10001):
+		t = 0
+		found = 0
+		while t < 50:
+			# reverse, add
+			n_ = str(n)[::-1]
+			n += int(n_) # also applicable e.g. 11000 + (000)11
+			t += 1
+			# do not count palindrome itself as valid
+			if (str(n)[::-1] == str(n)):# and (len(str(n)) != 1):
+				found = 1
+				break
+		if not found:
+			sol += 1
+
+	return sol
+
 
 def p56():
 	"""

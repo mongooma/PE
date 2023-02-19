@@ -1,4 +1,6 @@
-from fundamentals.cores import Array, Dic, Cores, Structures, GraphTheory
+
+import PE
+from PE.cores import Array, Dic, Cores, Structures, GraphTheory
 import time
 import sys
 import math
@@ -47,46 +49,7 @@ def p92():
 
 	return sol# len(reached_89)
 
-def p55():
-	"""
-	How many Lychrel numbers are there below ten-thousand?
-	(if not turn palindrome in 50 iters then announce it to be Lychrel)
-	"""
-	sol = 0
-	for n in range(1, 10001):
-		t = 1
-		while t <= 50:
-			# reverse, add
-			n_ = str(n)[::-1]
-			if len(str(int(n_))) == len(str(n)): # valid reverse?
-				n += int(n_)
-				if (str(n)[::-1] == str(n)) and (len(str(n)) != 1):
-					sol += 1
-					break
-			else:
-				break
-			t += 1
-
-	return sol  # error?
-####pending
-def p46():
-	"""
-	have a good storage plan for the computed
-
-	use a generation method
-	the smallest odd composite that cannot be written as the sum of a prime and twice a square
-	"""
-
-	MAX = 100000 # top MAX odd composite
-	primes = Cores.primesBelowN(MAX)
-	current_filled = np.nans(MAX)
-	squares_add = []
-	for n in range(1, MAX):
-		squares_add.append([])
-		last_add = squares_add
-	pass
-
 
 if __name__ == "__main__":
-	p86()
+	print(p55())
 	
