@@ -480,6 +480,38 @@ def p107():
 	return max_saving
 
 
+def p173(M):
+	"""
+	
+	smallest ring has edge length of n
+	in total N rings, the number of tiles:
+
+	sum_{i=0}^{N-1} (4n-4 + 8i)
+	
+	(4n-4)N + 4N(N-1) = 4N(N+n-2)
+
+	for every n, compute the largest N for 4N(N+n-2) < 10**6, 
+
+		N = floor((-p+sqrt(p**2+4*10**6))/2)
+		p = n-2
+
+	sum all the Ns
+
+	n starts from 3, ends before 4N-4 > 10**6
+	"""
+
+	n = 3
+	sumN = 0
+	while True:
+		if 4*n - 4 > M:
+			break
+		p = n-2
+		sumN += floor((-p+sqrt(p**2 + M))/2)
+		n += 1
+
+	return sumN
+
+
 
 if __name__ == "__main__":
 	print(p102())

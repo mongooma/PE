@@ -1464,6 +1464,45 @@ def p56():
 				sol = sum_curr
 	return sol
 
+def p57():
+	"""
+
+	 2 + 1/(p/q) = 2 + q/p = ((2*p) + q) / p
+
+	if p, q co-prime, then the result form is the irreducible form
+	"""
+
+	def next_fraction(p, q):
+		# 2 + 1/(p/q) = 2 + q/p = ((2*p) + q) / p
+		return [2*p + q, p]
+
+	def digit_n(n):
+		cnt = 0
+		while n:
+			n -= n % 10
+			n = n // 10
+			cnt += 1
+
+		return cnt
+
+	p = 2
+	q = 1
+	cnt = 0
+	for i in range(1, 1000):
+		p, q = next_fraction(p, q)
+
+		# get the numerator/denominator for 1 + q/p
+		d_n = digit_n(p) # p+q
+		n_n = digit_n(p+q)
+		if n_n > d_n:
+			cnt += 1
+
+		if i < 8:
+			print(p+q, p) # debug
+
+	return cnt
+
+
 def p58():
 	"""
 	(note: ppl think this one is easy, but it seems bulky to me...)
@@ -1893,6 +1932,84 @@ def p68():
 
 	return max(candids)
 
+def p74(N):
+	"""
+	
+	"""
+
+	loop_triggers = set()
+	loop_length = [-1 for _ in range(10000000+1)]
+
+	def next_num(n):
+		l = []
+		while n:
+			l.append(n % 10)
+			n -= n%10
+			n = n // 10
+		
+		return sum([factorial(i) for i in l])
+
+	for n in range(1, N):
+		if n % 10000 == 0:
+			print(n)
+		
+		if n in loop_triggers:
+			continue
+		visited = [n]
+		n_ = n
+
+		old_loop = 0
+		while 1:
+			n_ = next_num(n_)
+			if n_ in loop_triggers:
+				old_loop = 1
+				break
+			if n_ in visited:
+				break
+			visited.append(n_)
+
+		# record loop data
+		if old_loop: # trigger as n_
+			for i, n in enumerate(visited[::-1]):
+				loop_length[n] = loop_length[n_] + i + 1
+
+				# if n == 169 or n == 871 or n == 872:
+					# print("old_loop:", n, loop_length[n], visited)
+		
+		else: # new loop found
+			# x x x n_ x x x  
+			
+			for m in visited:
+				loop_triggers.add(m)
+
+			loop_start = visited.index(n_)
+			L = len(visited) - loop_start
+			# if n_ == 169 or n_ == 871 or n_ == 872:
+				# print(visited, loop_start, L)
+			
+			# in-loop
+			for m in visited[loop_start:]:
+				loop_length[m] = L
+			# out-loop
+			for i, m in enumerate(visited[:loop_start][::-1]):
+				loop_length[m] = L + i + 1
+
+			# for m in visited:
+				# if m == 169 or m == 871 or m == 872:
+					# print("new_loop:", m, loop_length[m])
+
+	# debug
+	print(loop_length[145]) # 1
+	print(loop_length[169]) # 3
+	print(loop_length[871]) # 2
+	print(loop_length[872]) # 2
+	print(loop_length[69]) # 5
+
+	return sum([1 for n in loop_length if n == 60])
+
+
+
+
 def p76():
 	"""Integer partition (ref p78)"""
 
@@ -2318,6 +2435,56 @@ def p90():
 	# return sols_mirror
 
 	return len(set(sols))
+
+def p92():
+	"""
+	(EVERY starting number will eventually arrive at 1 or 89.)
+	How many starting numbers below ten million will arrive at 89?
+	"""
+	
+	sol = 0
+	reached_1 = set([1])
+	reached_89 = set([89]) # early stop
+	for n_ in range(10**7-1, 2, -1):
+		if n_ % 100000 == 0:
+			print(n_)
+
+		if (n_ in reached_1) or (n_ in reached_89):
+			continue
+
+		
+		chain = [n_]
+		n = n_
+
+		while (n!=1) and (n!=89):
+			# early stop
+			if n in reached_1:
+				n = 1
+				break
+
+			if n in reached_89:
+				n = 89
+				break
+			
+			n = sum([int(s)**2 for s in str(n)])
+			chain.append(n)
+
+		# early stop
+		if n == 1:
+			for c in chain:
+				reached_1.add(c)
+			
+
+		if n == 89:
+			for c in chain:
+				reached_89.add(c)
+			
+
+
+
+	# print(reached_89)
+	return len(reached_89)
+
 
 def p97():
 	"""Find the last 10 digits of 28433*2^7830457+1, the non-Mersenne prime"""
